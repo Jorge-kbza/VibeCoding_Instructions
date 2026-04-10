@@ -1,67 +1,45 @@
 /**
- * Weather data transformer.
- * Responsible for transforming external API responses to internal format.
+ * Weather transformer for converting API response to DTO
+ * Handles serialization/deserialization of weather data
  */
-const {
-  temperatureBothUnits
-} = require('../utils/temperatureConverter');
-const { windSpeedBothUnits } = require('../utils/windSpeedConverter');
-const ApiError = require('../utils/ApiError');
+
+import {
+  getTemperatureInBothUnits,
+  getWindSpeedInBothUnits,
+} from '../utils/conversionUtils.js';
 
 /**
- * Validate weather data from external API.
- * @param {object} data - Raw data from API
- * @returns {boolean} True if data is valid
- * @throws {ApiError} If data is invalid
+ * Transform Open-Meteo API response to standardized weather DTO
+ * @param {Object} apiResponse - Response from Open-Meteo API
+ * @returns {Object} Standardized weather data object
  */
-const validateWeatherData = (data) => {
-  if (!data
-    || typeof data.current_weather !== 'object'
-    || data.current_weather === null) {
-    throw new ApiError(
-      'Invalid weather data structure from external API',
-      502
-    );
+export const transformWeatherResponse = (apiResponse) => {
+  if (!apiResponse.current_weather) {
+    throw new Error('Invalid weather data: current_weather field is missing');
   }
 
-  const currentWeather = data.current_weather;
+  const { temperature, windspeed } = apiResponse.current_weather;
 
-  if (typeof currentWeather.temperature !== 'number') {
-    throw new ApiError(
-      'Temperature data is missing or invalid',
-      502
-    );
+  // Validate that required fields exist
+  if (typeof temperature !== 'number' || typeof windspeed !== 'number') {
+    throw new Error('Invalid weather data: temperature and windspeed must be numbers');
   }
-
-  if (typeof currentWeather.wind_speed !== 'number') {
-    throw new ApiError(
-      'Wind speed data is missing or invalid',
-      502
-    );
-  }
-
-  return true;
-};
-
-/**
- * Transform external API response to application format.
- * @param {object} apiResponse - Response from Open-Meteo API
- * @returns {object} Transformed weather data
- */
-const transformWeatherData = (apiResponse) => {
-  validateWeatherData(apiResponse);
-
-  const currentWeather = apiResponse.current_weather;
-  const temperature = currentWeather.temperature;
-  const windSpeed = currentWeather.wind_speed;
 
   return {
-    temperature: temperatureBothUnits(temperature),
-    wind_speed: windSpeedBothUnits(windSpeed)
+    temperature: getTemperatureInBothUnits(temperature),
+    wind_speed: getWindSpeedInBothUnits(windspeed),
   };
 };
 
-module.exports = {
-  validateWeatherData,
-  transformWeatherData
+/**
+ * Create weather response object with metadata
+ * @param {Object} weatherData - Transformed weather data
+ * @returns {Object} Response object with data and metadata
+ */
+export const toWeatherResponse = (weatherData) => {
+  return {
+    temperature: weatherData.temperature,
+    wind_speed: weatherData.wind_speed,
+    timestamp: new Date().toISOString(),
+  };
 };

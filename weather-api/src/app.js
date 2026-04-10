@@ -1,36 +1,39 @@
 /**
- * Express Application Configuration.
- * Main application setup with middlewares and routes.
+ * Express application setup
+ * Configures middleware, routes, and error handling
  */
-const express = require('express');
-const weatherRoutes = require('./routes/weatherRoutes');
-const requestLogger = require('./middlewares/requestLogger');
-const errorHandler = require('./middlewares/errorHandler');
-const ApiError = require('./utils/ApiError');
+
+import express from 'express';
+import weatherRoutes from './routes/weatherRoutes.js';
+import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Middlewares
+// Middleware
 app.use(express.json());
-app.use(requestLogger);
+app.use(express.urlencoded({ extended: true }));
+
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
 
 // Routes
 app.use('/', weatherRoutes);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    timestamp: new Date().toISOString()
-  });
-});
+// 404 handler (must be before error handler)
+app.use(notFoundHandler);
 
-// 404 handler
-app.use((req, res, next) => {
-  next(new ApiError(`Route ${req.path} not found`, 404));
-});
-
-// Error handler middleware (must be last)
+// Global error handler (must be last)
 app.use(errorHandler);
 
-module.exports = app;
+// Start server
+app.listen(PORT, () => {
+  console.log(`Weather API server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`Get weather: http://localhost:${PORT}/weather`);
+});
+
+export default app;

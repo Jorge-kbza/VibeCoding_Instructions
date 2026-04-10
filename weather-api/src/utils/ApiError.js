@@ -1,13 +1,8 @@
 /**
- * Custom error class for API operations.
- * Extends Error to provide status code and consistent error handling.
+ * Custom error class for API errors
+ * Extends Error for proper error handling and status codes
  */
 class ApiError extends Error {
-  /**
-   * Create an ApiError instance.
-   * @param {string} message - Error message
-   * @param {number} status - HTTP status code (default: 500)
-   */
   constructor(message, status = 500) {
     super(message);
     this.status = status;
@@ -15,4 +10,4 @@ class ApiError extends Error {
   }
 }
 
-module.exports = ApiError;
+export default ApiError;

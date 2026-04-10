@@ -1,21 +1,19 @@
-module.exports = {
+export default {
   testEnvironment: 'node',
-  coveragePathIgnorePatterns: ['/node_modules/'],
+  transform: {},
   collectCoverageFrom: [
     'src/**/*.js',
-    '!src/**/*.test.js',
-    '!src/server.js'
+    '!src/app.js',
   ],
   testMatch: [
-    '**/__tests__/**/*.js',
-    '**/?(*.)+(spec|test).js'
+    '**/__tests__/**/*.test.js',
   ],
   coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,
       lines: 70,
-      statements: 70
-    }
-  }
+      statements: 70,
+    },
+  },
 };

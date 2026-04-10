@@ -1,35 +1,53 @@
 /**
- * Weather Controller.
- * Handles HTTP requests and responses for weather endpoints.
- * Thin controller - delegates logic to services.
+ * Weather controller
+ * Handles HTTP requests and responses
+ * Orchestrates between service and transformer layers
  */
-const { getCurrentWeather } = require('../services/weatherService');
-const ApiError = require('../utils/ApiError');
+
+import { fetchCurrentWeather } from '../services/weatherService.js';
+import { transformWeatherResponse, toWeatherResponse } from '../transformers/weatherTransformer.js';
 
 /**
- * Get current weather data.
- * @param {object} req - Express request object
- * @param {object} res - Express response object
- * @param {function} next - Express next middleware function
+ * Get current weather data
+ * Route: GET /weather
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
  */
-const getWeather = async (req, res, next) => {
+export const getWeather = async (req, res, next) => {
   try {
-    const weatherData = await getCurrentWeather();
+    // Step 1: Fetch weather data from external API
+    const apiResponse = await fetchCurrentWeather();
 
+    // Step 2: Transform API response to internal format
+    const transformedData = transformWeatherResponse(apiResponse);
+
+    // Step 3: Create response DTO
+    const responseData = toWeatherResponse(transformedData);
+
+    // Step 4: Send response
     res.status(200).json({
       success: true,
-      data: weatherData,
-      timestamp: new Date().toISOString()
+      data: {
+        temperature: responseData.temperature,
+        wind_speed: responseData.wind_speed,
+      },
     });
   } catch (error) {
-    if (error instanceof ApiError) {
-      next(error);
-    } else {
-      next(new ApiError('Internal server error', 500));
-    }
+    // Pass error to global error handler
+    next(error);
   }
 };
 
-module.exports = {
-  getWeather
+/**
+ * Health check endpoint
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+export const healthCheck = (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Weather API is running',
+    timestamp: new Date().toISOString(),
+  });
 };
