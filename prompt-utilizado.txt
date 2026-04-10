@@ -1,0 +1,124 @@
+Actúa como un desarrollador backend senior experto en Node.js.
+
+Debes generar un proyecto completo que cumpla estrictamente todas las instructions proporcionadas en el workspace, incluyendo:
+- mvc-backend-best-practices.instructions.md
+- javascript-best-practices.instructions.md
+- api-error-handling.instructions.md
+- data-transformation-layer.instructions.md
+- external-apis-integration.instruction.md
+- jest-unit-testing.instructions.md
+- (todas las demás instructions disponibles)
+
+NO ignores ninguna instruction. Si hay conflicto, prioriza arquitectura limpia, separación de responsabilidades y buenas prácticas.
+
+---
+
+## OBJETIVO
+
+Construir una API REST que exponga un endpoint:
+
+GET /weather
+
+---
+
+## REQUISITOS FUNCIONALES
+
+- Consumir datos meteorológicos desde:
+https://api.open-meteo.com/v1/forecast?latitude=39.47&longitude=-0.38&current_weather=true
+
+- Extraer de la respuesta:
+  - temperatura
+  - velocidad del viento
+
+- Transformar los datos para devolver:
+
+Temperatura:
+- Celsius
+- Fahrenheit
+
+Velocidad del viento:
+- km/h
+- m/s
+
+---
+
+## FORMATO DE RESPUESTA
+
+La API debe responder exactamente con esta estructura:
+
+{
+  "temperature": {
+    "celsius": number,
+    "fahrenheit": number
+  },
+  "wind_speed": {
+    "kmh": number,
+    "ms": number
+  }
+}
+
+---
+
+## REQUISITOS TÉCNICOS
+
+- Usar Node.js con Express
+- Seguir arquitectura MVC estricta
+- Separar correctamente:
+  - controllers
+  - services
+  - utils
+  - routes
+  - middlewares
+
+---
+
+## REGLAS IMPORTANTES
+
+- NO poner lógica de negocio en controllers
+- Las conversiones deben estar en utils como funciones puras
+- El consumo de la API externa debe estar en services
+- Usar async/await
+- Manejar errores usando middleware global (según instructions)
+- Validar la respuesta de la API externa
+
+---
+
+## TESTING
+
+- Crear tests unitarios usando Jest
+- Testear obligatoriamente:
+  - conversión de temperatura
+  - conversión de velocidad
+
+---
+
+## ESTRUCTURA DEL PROYECTO
+
+Generar todos los archivos necesarios, incluyendo:
+- app.js o server.js
+- routes
+- controllers
+- services
+- utils
+- middlewares
+- tests
+- package.json
+
+---
+
+## IMPORTANTE
+
+- El código debe ser limpio, modular y profesional
+- No generar código innecesario
+- No simplificar la arquitectura
+- No hardcodear lógica fuera de su capa correspondiente
+
+---
+
+## SALIDA
+
+Genera:
+1. Estructura de carpetas
+2. Código completo de todos los archivos
+3. Tests incluidos
+4. Instrucciones para ejecutar el proyecto
